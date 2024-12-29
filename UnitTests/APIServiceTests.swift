@@ -121,7 +121,7 @@ final class APIServiceTests: XCTestCase {
         }
     }
     
-    // MARK: -
+    // MARK: - test fetch ships empty list
     
     func testFetchShipsEmptyList() async throws {
         // Given: Задано сетевое подключение, но пришел пустой список
@@ -141,7 +141,7 @@ final class APIServiceTests: XCTestCase {
         XCTAssertEqual(fetchedShips.count, 0)
     }
     
-    // MARK: - Hay
+    // MARK: - Test fetch ships missing optional fields
     
     func testFetchShipsMissingOptionalFields() async throws {
         // Given: Задано сетевое подключение, которое возвращает данные с отсутствующими необязательными полями
