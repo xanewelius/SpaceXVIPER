@@ -121,7 +121,7 @@ final class APIServiceTests: XCTestCase {
         }
     }
     
-    // MARK: - test fetch ships empty list
+    // MARK: - Test fetch ships empty list
     
     func testFetchShipsEmptyList() async throws {
         // Given: Задано сетевое подключение, но пришел пустой список

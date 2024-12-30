@@ -9,6 +9,10 @@ final class HomePresenter {
     private let interactor: HomeInteractorInput
     private let router: HomeRouterInput
     
+    private weak var detailedScreen: ShipDetailsModuleInput?
+    
+    var ships: [DisplayShip] = []
+    
     // MARK: - Initializer
     
     init(view: HomeViewInput, interactor: HomeInteractorInput, router: HomeRouterInput) {
@@ -37,6 +41,10 @@ extension HomePresenter: HomeViewOutput {
             self.interactor.obtainData()
         }
     }
+    
+    func didSelectShip(id: String) {
+        detailedScreen = router.presentDetails(with: id, presenter: self)
+    }
 }
 
 // MARK: - HomeInteractorOutput
@@ -47,7 +55,8 @@ extension HomePresenter: HomeInteractorOutput {
         if ships.isEmpty {
             view.set(state: .empty)
         } else {
-            view.set(state: .success(ships.map { convertShip(from: $0) }))
+            self.ships = ships.map { convertShip(from: $0) }
+            view.set(state: .success)
         }
     }
     
@@ -55,13 +64,14 @@ extension HomePresenter: HomeInteractorOutput {
         DisplayShip(
             shipId: ship.shipId,
             shipName: ship.shipName,
-            shipModel: ship.shipModel ?? "Unknown",
-            shipType: ship.shipType ?? "Unknown",
-            roles: ship.roles?.joined(separator: ", ") ?? "Unknown",
+            shipModel: "Model: \(ship.shipModel ?? "Unknown")",
+            shipType: "Type: \(ship.shipType ?? "Unknown")",
+            roles: "Roles: \(ship.roles?.joined(separator: ", ") ?? "Unknown")",
             active: ship.active ?? false ? "Active" : "Inactive",
-            yearBuilt: ship.yearBuilt == nil ? "Year Built: Unknown" : "Year Built: \(ship.yearBuilt!)",
-            homePort: ship.homePort ?? "Unknown",
-            imageURL: ship.image.flatMap { URL(string: $0) }
+            yearBuilt: "Year Built: \(ship.yearBuilt == nil ? "Unknown" : "\(ship.yearBuilt!)")",
+            homePort: "Port: \(ship.homePort ?? "Unknown")",
+            imageURL: ship.image.flatMap { URL(string: $0) },
+            isFavorite: interactor.isFavorite(from: ship.shipId)
         )
     }
     
@@ -90,5 +100,17 @@ extension HomePresenter: HomeInteractorOutput {
         }
         
         view.set(state: state)
+    }
+}
+
+// MARK: - ShipDetailsModuleOutput
+
+extension HomePresenter: ShipDetailsModuleOutput {
+    
+    func shipDetailsModule(shipId: String, didUpdateFavoriteStatus isFavorite: Bool) {
+        if let index = ships.firstIndex(where: { $0.shipId == shipId }) {
+            ships[index].isFavorite = isFavorite
+            view.refreshShip(at: index)
+        }
     }
 }

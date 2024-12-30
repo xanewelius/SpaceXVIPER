@@ -11,6 +11,8 @@ final class ShipTableCell: UITableViewCell {
     // MARK: - UI Components
     
     private let shipImageView = UIImageView(frame: .zero)
+    private let favoriteImageView = UIImageView(frame: .zero)
+    
     private let nameLabel = UILabel(frame: .zero)
     private let modelLabel = UILabel(frame: .zero)
     private let typeLabel = UILabel(frame: .zero)
@@ -27,14 +29,39 @@ final class ShipTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        embedViews()
-        setupStackAppearance()
-        setupLayout()
-        setupAppearance()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        shipImageView.image = nil
+        favoriteImageView.image = nil
+        
+        shipImageView.kf.cancelDownloadTask()
+        
+        nameLabel.text = nil
+        modelLabel.text = nil
+        typeLabel.text = nil
+        rolesLabel.text = nil
+        statusLabel.text = nil
+        yearBuiltLabel.text = nil
+        homePortLabel.text = nil
+    }
+}
+
+// MARK: -
+
+private extension ShipTableCell {
+    func setupUI() {
+        embedViews()
+        setupStackAppearance()
+        setupLayout()
+        setupAppearance()
     }
 }
 
@@ -52,7 +79,8 @@ private extension ShipTableCell {
             rolesLabel,
             statusLabel,
             yearBuiltLabel,
-            homePortLabel
+            homePortLabel,
+            favoriteImageView
         ].forEach {
             infoStackView.addArrangedSubview($0)
         }
@@ -137,6 +165,10 @@ extension ShipTableCell {
         typeLabel.text = ship.shipType
         rolesLabel.text = ship.roles
         statusLabel.text = ship.active
+        
+        // FIXME: - Delete .textColor
+        statusLabel.textColor = ship.active == "Active" ? .systemGreen : .systemRed
+        
         yearBuiltLabel.text = ship.yearBuilt
         homePortLabel.text = ship.homePort
         
@@ -148,6 +180,10 @@ extension ShipTableCell {
             )
         } else {
             shipImageView.image = UIImage(systemName: "photo")
+        }
+        
+        if ship.isFavorite {
+            favoriteImageView.image = UIImage(systemName: "star.fill")
         }
     }
 }

@@ -17,7 +17,11 @@ final class HomeRouter {
 
 extension HomeRouter: HomeRouterInput {
     
-    func presentDetails() {
-        print("HomeRouter: presentDetails")
+    func presentDetails(with shipId: String, presenter: HomePresenter) -> ShipDetailsModuleInput {
+        let view = ShipDetailsViewController()
+        let module = ShipDetailsAssembly.assembly(view: view, with: shipId, output: presenter)
+        transitionHandler.present(with: view, animated: true)
+        
+        return module
     }
 }

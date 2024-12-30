@@ -10,4 +10,5 @@ struct DisplayShip {
     let yearBuilt: String
     let homePort: String
     let imageURL: URL?
+    var isFavorite: Bool
 }

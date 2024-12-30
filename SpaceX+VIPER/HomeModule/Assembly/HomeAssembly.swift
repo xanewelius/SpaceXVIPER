@@ -4,7 +4,8 @@ final class HomeAssembly {
     
     static func assembly(with view: HomeView) {
         let apiService = ShipsAPIService()
-        let interactor = HomeInteractor(apiService: apiService)
+        let cacheService = CacheService()
+        let interactor = HomeInteractor(apiService: apiService, cacheService: cacheService)
         let router = HomeRouter(transitionHandler: view)
         let presenter = HomePresenter(view: view, interactor: interactor, router: router)
         

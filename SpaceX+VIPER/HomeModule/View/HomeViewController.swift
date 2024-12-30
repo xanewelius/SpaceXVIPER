@@ -14,14 +14,20 @@ final class HomeViewController: UIViewController, HomeView {
     private let errorView = ErrorView(frame: .zero)
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     
-    // MARK: - Data
-    
-    private var ships: [DisplayShip] = []
+    // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setupUI()
         output.viewDidLoad()
+    }
+}
+
+// MARK: - Setup UI
+
+private extension HomeViewController {
+    
+    func setupUI() {
         embedViews()
         setupLayout()
         setupBehavior()
@@ -110,13 +116,13 @@ private extension HomeViewController {
 extension HomeViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        ships.count
+        output.ships.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ShipTableCell.cellID, for: indexPath) as? ShipTableCell else { return UITableViewCell() }
         
-        let ship = ships[indexPath.row]
+        let ship = output.ships[indexPath.row]
         cell.set(with: ship)
         
         return cell
@@ -125,7 +131,14 @@ extension HomeViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 
-extension HomeViewController: UITableViewDelegate {}
+extension HomeViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let ship = output.ships[indexPath.row]
+        output.didSelectShip(id: ship.shipId)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
 
 // MARK: - HomeViewInput
 
@@ -135,27 +148,26 @@ extension HomeViewController {
         switch state {
         case .loading:
             activityIndicator.startAnimating()
-            self.ships = []
+            self.output.ships = []
             emptyView.isHidden = true
             errorView.isHidden = true
             tableView.isHidden = true
-        case .success(let ships):
+        case .success:
             activityIndicator.stopAnimating()
-            self.ships = ships
             emptyView.isHidden = true
             errorView.isHidden = true
             tableView.isHidden = false
             self.tableView.reloadData()
         case .error(let description):
             activityIndicator.stopAnimating()
-            self.ships = []
+            self.output.ships = []
             emptyView.isHidden = true
             errorView.isHidden = false
             tableView.isHidden = true
             updateErrorState(message: description)
         case .empty:
             activityIndicator.stopAnimating()
-            self.ships = []
+            self.output.ships = []
             emptyView.isHidden = false
             errorView.isHidden = true
             tableView.isHidden = true
@@ -174,6 +186,10 @@ extension HomeViewController {
     
     func hideActivityIndicator() {
         activityIndicator.stopAnimating()
+    }
+    
+    func refreshShip(at index: Int) {
+        tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
     }
 }
 

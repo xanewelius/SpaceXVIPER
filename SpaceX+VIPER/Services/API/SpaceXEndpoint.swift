@@ -18,10 +18,8 @@ enum SpaceXEndpoint: Endpoint {
     
     var method: HTTPMethod {
         switch self {
-        case .ships, .shipDetails:
-                .GET
-        case .createShip:
-                .POST
+        case .ships, .shipDetails: .GET
+        case .createShip: .POST
         }
     }
     

@@ -4,6 +4,7 @@ import Foundation
 
 protocol APIServiceType {
     func fetchShips() async throws -> [Ship]
+    func fetchShipDetails(by id: String) async throws -> Ship
 }
 
 // MARK: - ShipsAPIService
@@ -34,6 +35,10 @@ final class ShipsAPIService: APIServiceType {
     
     func fetchShips() async throws -> [Ship] {
         try await request(SpaceXEndpoint.ships)
+    }
+    
+    func fetchShipDetails(by id: String) async throws -> Ship {
+        try await request(SpaceXEndpoint.shipDetails(id: id))
     }
 }
 

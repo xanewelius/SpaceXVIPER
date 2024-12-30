@@ -2,6 +2,7 @@ import Foundation
 
 protocol HomeInteractorInput: AnyObject {
     func obtainData()
+    func isFavorite(from shipId: String) -> Bool
 }
 
 protocol HomeInteractorOutput: AnyObject {
